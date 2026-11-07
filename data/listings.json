@@ -1,0 +1,30 @@
+[
+  {
+    "listing_id": "L001",
+    "farmer_id": "F001",
+    "crop": "Tomatoes",
+    "quantity": 20,
+    "unit": "bags",
+    "price": 250,
+    "price_unit": "per bag",
+    "location": "Chongwe",
+    "date_listed": "2026-11-01",
+    "status": "Available",
+    "contact_consent": "Yes",
+    "demo": true
+  },
+  {
+    "listing_id": "L002",
+    "farmer_id": "F002",
+    "crop": "Maize",
+    "quantity": 15,
+    "unit": "bags",
+    "price": 340,
+    "price_unit": "per bag",
+    "location": "Lusaka",
+    "date_listed": "2026-11-01",
+    "status": "Available",
+    "contact_consent": "No",
+    "demo": true
+  }
+]

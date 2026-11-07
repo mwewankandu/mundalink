@@ -1,0 +1,18 @@
+[
+  {
+    "farmer_id": "F001",
+    "name": "John Banda",
+    "location": "Chongwe",
+    "phone": "DEMO-001",
+    "consent": "Yes",
+    "demo": true
+  },
+  {
+    "farmer_id": "F002",
+    "name": "Mary Phiri",
+    "location": "Lusaka",
+    "phone": "DEMO-002",
+    "consent": "No",
+    "demo": true
+  }
+]

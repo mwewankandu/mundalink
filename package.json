@@ -1,0 +1,13 @@
+{
+  "name": "mundalink",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MundaLink — a simple AI marketplace assistant for small-scale Zambian farmers and buyers.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

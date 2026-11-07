@@ -1,0 +1,38 @@
+[
+  {
+    "crop": "Maize",
+    "market": "Lusaka open market",
+    "location": "Lusaka",
+    "price": null,
+    "price_label": "Demo only",
+    "unit": "50kg bag",
+    "date": "2026-11-01",
+    "source": "Fictional demo record for the Grok Bot Lusaka Hackathon. Not a live price. Later, copy a dated figure from the Ministry of Agriculture (https://www.agriculture.gov.zm/) or ZamStats (https://www.zamstats.gov.zm/agriculture/).",
+    "price_type": "open-market",
+    "demo": true
+  },
+  {
+    "crop": "Tomatoes",
+    "market": "Soweto Market",
+    "location": "Lusaka",
+    "price": null,
+    "price_label": "Demo only",
+    "unit": "crate",
+    "date": "2026-11-01",
+    "source": "Fictional demo record for the Grok Bot Lusaka Hackathon. Not a live price. Soweto Market prices should be copied from a dated market bulletin before they are treated as real.",
+    "price_type": "open-market",
+    "demo": true
+  },
+  {
+    "crop": "Maize",
+    "market": "FRA purchase price placeholder",
+    "location": "Zambia",
+    "price": null,
+    "price_label": "Demo only",
+    "unit": "50kg bag",
+    "date": "2026-11-01",
+    "source": "Placeholder only. This is not a Food Reserve Agency price. Replace it with a dated official FRA or Ministry of Agriculture notice before quoting it as an official purchase price.",
+    "price_type": "official",
+    "demo": true
+  }
+]
