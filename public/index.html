@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MundaLink — Grow more. Waste less. Earn better.</title>
+  <meta name="description" content="MundaLink helps small-scale Zambian farmers list produce and helps buyers find what is available.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,680&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip" href="#home">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#home">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="32" height="32">
+          <rect width="32" height="32" rx="8" fill="#145c32"/>
+          <circle cx="23" cy="9" r="3" fill="#e0a106"/>
+          <path d="M16 27c0-7 5-9 5-16 2.2 2 3.4 5 3.4 8 0 4.4-3.4 7.4-8.4 8z" fill="#e0a106"/>
+          <path d="M16 27c0-7-5-9-5-16-2.2 2-3.4 5-3.4 8 0 4.4 3.4 7.4 8.4 8z" fill="#f4efe4"/>
+        </svg>
+      </span>
+      <span>
+        <span class="brand-name">MundaLink</span>
+        <span class="brand-tag">Grow more. Waste less. Earn better.</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Page">
+      <a href="#listings">Produce</a>
+      <a href="#prices">Prices</a>
+      <a href="#advice">Storage</a>
+      <a href="#chat">Chat</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <p class="eyebrow">Zambia · Small-scale farmers and buyers</p>
+        <h1>MundaLink</h1>
+        <p class="tagline">Grow more. Waste less.<br>Earn better.</p>
+        <p class="lede">An assistant for the harvest. Farmers list what they have. Buyers search what is really available. Phone numbers stay off the public page.</p>
+        <div class="hero-actions">
+          <a class="button" href="#chat">Talk to MundaLink</a>
+          <a class="button button-ghost" href="#listings">See produce</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 420 280">
+          <rect width="420" height="280" rx="28" fill="#145c32"/>
+          <circle cx="318" cy="68" r="28" fill="#e0a106"/>
+          <path d="M0 196c48-36 78-28 120-8 40 18 62 8 100-16 34-22 70-18 110 4 28 16 58 18 90 2v102H0V196z" fill="#1e7a42"/>
+          <path d="M0 224c60-20 90-8 140 6 46 12 70-6 118-10 40-4 78 16 162 8v52H0v-56z" fill="#f4efe4"/>
+          <g fill="#0f4d28">
+            <rect x="46" y="168" width="6" height="28" rx="2"/>
+            <rect x="70" y="160" width="6" height="36" rx="2"/>
+            <rect x="94" y="172" width="6" height="24" rx="2"/>
+            <rect x="168" y="154" width="6" height="34" rx="2"/>
+            <rect x="192" y="148" width="6" height="40" rx="2"/>
+            <rect x="216" y="158" width="6" height="30" rx="2"/>
+          </g>
+          <g fill="#e0a106">
+            <circle cx="49" cy="164" r="5"/>
+            <circle cx="73" cy="156" r="5"/>
+            <circle cx="97" cy="168" r="5"/>
+            <circle cx="171" cy="150" r="5"/>
+            <circle cx="195" cy="144" r="5"/>
+            <circle cx="219" cy="154" r="5"/>
+          </g>
+        </svg>
+        <p class="art-caption">A field, a fair price, a buyer nearby.</p>
+      </div>
+    </section>
+
+    <aside class="chat-panel" id="chat" aria-label="MundaLink chat">
+      <div class="chat-head">
+        <div>
+          <h2>Ask MundaLink</h2>
+          <p id="chat-status">Checking the connection…</p>
+        </div>
+      </div>
+      <div id="messages" class="messages" aria-live="polite">
+        <article class="bubble assistant">
+          <p>Hello. I am MundaLink. Are you a farmer with produce to sell, a buyer looking for crops, or do you want a market price or storage advice?</p>
+        </article>
+      </div>
+      <p id="chat-pending" class="pending" hidden>Checking the records…</p>
+      <div class="chips" aria-label="Example questions">
+        <button type="button" data-prompt="I want to sell tomatoes">I want to sell tomatoes</button>
+        <button type="button" data-prompt="I need 10 bags of tomatoes in Chongwe">Find tomatoes in Chongwe</button>
+        <button type="button" data-prompt="I need onions in Chongwe">Look for onions</button>
+        <button type="button" data-prompt="What is the market price of maize?">Maize price</button>
+      </div>
+      <form id="chat-form" class="composer">
+        <label class="visually-hidden" for="chat-input">Message MundaLink</label>
+        <textarea id="chat-input" rows="2" placeholder="Type a message. Example: I want to sell tomatoes" required></textarea>
+        <button class="button" type="submit">Send</button>
+      </form>
+    </aside>
+
+    <div class="rest">
+      <section id="listings" class="panel">
+        <div class="section-head">
+          <h2>Produce available</h2>
+          <button class="button button-ghost" type="button" id="refresh-listings">Refresh</button>
+        </div>
+        <p class="section-note">Farmer asking prices, in kwacha. Phone numbers are not shown. A number is shared in chat only when that farmer has agreed. Rows marked <strong>Demo data</strong> are fictional.</p>
+        <div id="listing-cards" class="cards" aria-live="polite"></div>
+      </section>
+
+      <section id="prices" class="panel">
+        <div class="section-head">
+          <h2>Market prices</h2>
+          <button class="button button-ghost" type="button" id="refresh-prices">Refresh</button>
+        </div>
+        <p class="section-note">Each report shows its source and date. <strong>Demo only</strong> means there is no verified kwacha amount yet. MundaLink will not invent one. Official purchase prices, such as FRA, are labelled separately from open-market prices.</p>
+        <div id="price-cards" class="cards"></div>
+        <p class="sources">Later, real figures can come from the <a href="https://www.agriculture.gov.zm/">Ministry of Agriculture</a>, <a href="https://www.zamace.co.zm/">ZAMACE</a>, <a href="https://www.zamstats.gov.zm/agriculture/">ZamStats</a>, and <a href="https://www.zari.gov.zm/post-harvest-3/">ZARI post-harvest notes</a>.</p>
+      </section>
+
+      <section id="advice" class="panel">
+        <h2>Waste less</h2>
+        <p>Short habits that cut post-harvest loss. For a serious pest, disease, or food-safety problem, ask an agricultural extension officer.</p>
+        <ul class="tips">
+          <li><strong>Harvest gently.</strong> Pick in the cooler hours and leave bruised fruit out of the bag you will sell.</li>
+          <li><strong>Sort and grade.</strong> Keep similar size and ripeness together so buyers can see what they are paying for.</li>
+          <li><strong>Pack clean.</strong> Use crates or bags that can breathe. Do not seal tomatoes in plastic in the sun.</li>
+          <li><strong>Store maize dry.</strong> Dry it well, keep it off the soil, and protect it from rats and rain.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p><strong>MundaLink</strong> · Grow more. Waste less. Earn better.</p>
+    <p>Demo for the Grok Bot Lusaka Hackathon, 21 November 2026. Sample farmers and price rows are fictional.</p>
+  </footer>
+  <script src="/app.js"></script>
+</body>
+</html>
