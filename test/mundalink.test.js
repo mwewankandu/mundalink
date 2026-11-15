@@ -261,6 +261,10 @@ describe("registration", () => {
 describe("chat tool loop", () => {
   it("keeps the build-pack prompt and explains the missing key without calling the API", async () => {
     assert.equal(SYSTEM_PROMPT.startsWith(VERBATIM_PROMPT), true);
+    assert.match(SYSTEM_PROMPT, /Reply in the language of the latest user message/);
+    assert.match(SYSTEM_PROMPT, /Never change a number/);
+    assert.match(SYSTEM_PROMPT, /chimanga/);
+    assert.match(SYSTEM_PROMPT, /amataba/);
     assert.match(VERBATIM_PROMPT, /Grow more\. Waste less\. Earn better\./);
     assert.match(VERBATIM_PROMPT, /Ask one question at a time/);
     assert.match(VERBATIM_PROMPT, /Never reveal a farmer's private phone number/);
@@ -442,6 +446,141 @@ describe("chat tool loop", () => {
   });
 });
 
+describe("Bemba and Nyanja", () => {
+  it("stores English crop and unit names from local words", () => {
+    const store = createStore(tempData());
+    const saved = store.registerListing({
+      farmer_name: "Grace Zulu",
+      location: "ku Kafue",
+      crop: "phwetekere",
+      quantity: 20,
+      unit: "matumba",
+      asking_price: 250,
+      price_unit: "pa thumba",
+      phone: "DEMO-088",
+      consent: "ayi",
+      confirmed: "inde",
+    });
+    assert.equal(saved.saved, true);
+    assert.equal(saved.saved_in_english.crop, "Tomatoes");
+    assert.equal(saved.saved_in_english.unit, "bags");
+    assert.equal(saved.saved_in_english.location, "Kafue");
+    assert.equal(saved.saved_in_english.quantity, 20);
+    assert.equal(saved.saved_in_english.price, 250);
+    const listing = store.listPublicListings().find((row) => row.listing_id === saved.listing_id);
+    assert.equal(listing.crop, "Tomatoes");
+    assert.equal(listing.unit, "bags");
+    assert.equal(listing.contact_consent, "No");
+    assert.equal(JSON.stringify(listing).includes("phwetekere"), false);
+    assert.equal(JSON.stringify(listing).includes("matumba"), false);
+  });
+
+  it("searches maize and tomatoes from Nyanja and Bemba words", () => {
+    const store = createStore(tempData());
+    const maize = store.searchListings({
+      crop: "chimanga",
+      quantity: 10,
+      unit: "matumba",
+      location: "ku Lusaka",
+    });
+    assert.equal(maize.understood.crop_in_english, "Maize");
+    assert.equal(maize.understood.unit_in_english, "bags");
+    assert.equal(maize.understood.location, "Lusaka");
+    assert.equal(maize.exact_matches[0].listing_id, "L002");
+
+    const bemba = store.searchListings({ crop: "amataba", quantity: 10, location: "Lusaka" });
+    assert.equal(bemba.exact_matches[0].listing_id, "L002");
+
+    const tomatoes = store.searchListings({
+      crop: "tamati",
+      quantity: 10,
+      unit: "imitumba",
+      location: "Chongwe",
+    });
+    assert.equal(tomatoes.understood.crop_in_english, "Tomatoes");
+    assert.equal(tomatoes.exact_matches[0].listing_id, "L001");
+    assert.equal(tomatoes.exact_matches[0].estimated_total_kwacha, 2500);
+  });
+
+  it("does not invent a crop that is missing from the glossary", () => {
+    const store = createStore(tempData());
+    const result = store.searchListings({ crop: "ifisashi", location: "Chongwe" });
+    assert.equal(result.understood.in_glossary, false);
+    assert.equal(result.exact_matches.length, 0);
+    assert.match(result.message, /not in the glossary/);
+    const prices = store.getMarketPrices("chimanga");
+    assert.equal(prices.crop_in_english, "Maize");
+    assert.equal(prices.reports.length, 2);
+    assert.equal(prices.reports.every((row) => row.price === null), true);
+  });
+
+  it("uses the same tools when the mocked model passes local words", async () => {
+    const dir = tempData();
+    const { fetchImpl, calls } = scriptedFetch([
+      toolCall("call_ny", "search_listings", {
+        crop: "chimanga",
+        quantity: 10,
+        unit: "matumba",
+        location: "ku Lusaka",
+      }),
+      textReply("Ndapeza chimanga ku Lusaka. Maize, 15 bags, K340 per bag."),
+    ]);
+    const result = await runChat({
+      store: createStore(dir),
+      messages: [{ role: "user", content: "Ndifuna matumba 10 ya chimanga ku Lusaka" }],
+      apiKey: "test-key",
+      language: "nya",
+      fetchImpl,
+    });
+    assert.equal(result.ok, true);
+    assert.match(calls[0].body.messages[0].content, /Reply in the language/);
+    assert.match(calls[0].body.messages[0].content, /Chinyanja/);
+    const toolMessage = calls[1].body.messages.find((message) => message.role === "tool");
+    assert.match(toolMessage.content, /L002/);
+    assert.match(toolMessage.content, /Maize/);
+    assert.equal(toolMessage.content.includes("DEMO-002"), false);
+
+    const save = scriptedFetch([
+      toolCall("call_save_ny", "register_farmer_listing", {
+        farmer_name: "Grace Zulu",
+        location: "ku Chongwe",
+        crop: "phwetekere",
+        quantity: 20,
+        unit: "matumba",
+        asking_price: 250,
+        consent: "ayi",
+        confirmed: true,
+      }),
+      textReply("Yasungidwa. Tomatoes, 20 bags, Chongwe, K250 per bag."),
+    ]);
+    const saved = await runChat({
+      store: createStore(dir),
+      messages: [{ role: "user", content: "Inde, sungani." }],
+      apiKey: "test-key",
+      language: "nya",
+      fetchImpl: save.fetchImpl,
+    });
+    assert.equal(saved.listingsChanged, true);
+    const listing = createStore(dir).listPublicListings().find((row) => row.listing_id === "L003");
+    assert.equal(listing.crop, "Tomatoes");
+    assert.equal(listing.unit, "bags");
+    assert.equal(listing.location, "Chongwe");
+    assert.equal(listing.quantity, 20);
+  });
+
+  it("answers in the selected language when the API key is missing", async () => {
+    const result = await runChat({
+      store: createStore(tempData()),
+      messages: [{ role: "user", content: "Ndine na matumba 20 ya tomato ku Chongwe" }],
+      apiKey: "",
+      language: "nya",
+      fetchImpl: () => { throw new Error("should not call the API"); },
+    });
+    assert.match(result.reply, /XAI_API_KEY/);
+    assert.match(result.reply, /Chat ilibe key/);
+  });
+});
+
 describe("website", () => {
   let server;
   let port;
@@ -482,6 +621,8 @@ describe("website", () => {
     assert.equal(page.status, 200);
     assert.match(html, /MundaLink/);
     assert.match(html, /Grow more\. Waste less\. Earn better\./);
+    assert.match(html, /Ichibemba/);
+    assert.match(html, /Chinyanja/);
     assert.equal(html.includes("DEMO-001"), false);
 
     const health = await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();

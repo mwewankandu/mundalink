@@ -82,6 +82,7 @@ function createApp(options = {}) {
         apiKey,
         model,
         fetchImpl,
+        language: body.language,
       });
       return sendJson(res, 200, result);
     }

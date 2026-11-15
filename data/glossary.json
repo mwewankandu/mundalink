@@ -1,0 +1,24 @@
+{
+  "note": "Draft translations for the hackathon. They were written with AI help, not by a native speaker. Have a Bemba speaker and a Nyanja speaker check every row before the demo. Listings are always saved with the English word.",
+  "crops": [
+    { "english": "Maize", "nyanja": ["chimanga"], "bemba": ["itaba", "amataba"] },
+    { "english": "Tomatoes", "nyanja": ["phwetekere", "pwetekere", "matimati"], "bemba": ["tamati"] },
+    { "english": "Onions", "nyanja": ["anyezi"], "bemba": [] },
+    { "english": "Cabbage", "nyanja": ["kabichi"], "bemba": ["kabichi"] },
+    { "english": "Groundnuts", "nyanja": ["mtedza"], "bemba": ["imbalala"] },
+    { "english": "Beans", "nyanja": ["nyemba"], "bemba": [] },
+    { "english": "Rice", "nyanja": ["mpunga"], "bemba": ["umupunga"] },
+    { "english": "Cassava", "nyanja": ["chinangwa"], "bemba": ["kalundwe"] },
+    { "english": "Sweet potatoes", "nyanja": ["mbatata"], "bemba": [] },
+    { "english": "Irish potatoes", "nyanja": ["mbatatesi", "mbatatase"], "bemba": ["cilashi", "icilashi"] },
+    { "english": "Bananas", "nyanja": ["ntochi", "nthochi"], "bemba": [] }
+  ],
+  "units": [
+    { "english": "bags", "nyanja": ["thumba", "matumba"], "bemba": ["umutumba", "imitumba"] },
+    { "english": "kg", "nyanja": ["kilo", "makilo"], "bemba": ["kilo"] },
+    { "english": "crates", "nyanja": ["bokosi", "mabokosi"], "bemba": ["bokosi"] },
+    { "english": "tonnes", "nyanja": ["tani", "matani"], "bemba": ["tani"] }
+  ],
+  "yes": { "nyanja": ["inde", "eyo"], "bemba": ["ee", "eya"] },
+  "no": { "nyanja": ["ayi", "iyayi"], "bemba": ["awe"] }
+}
