@@ -2,6 +2,7 @@
 // The server talks to Grok. This file never sees the API key.
 
 const history = [];
+let language = "en";
 const messagesEl = document.querySelector("#messages");
 const form = document.querySelector("#chat-form");
 const input = document.querySelector("#chat-input");
@@ -9,7 +10,44 @@ const pendingEl = document.querySelector("#chat-pending");
 const statusEl = document.querySelector("#chat-status");
 const listingCards = document.querySelector("#listing-cards");
 const priceCards = document.querySelector("#price-cards");
-const chips = document.querySelectorAll("[data-prompt]");
+const chipBox = document.querySelector(".chips");
+const sendButton = form.querySelector("button");
+
+const UI = {
+  en: {
+    greeting: "Hello. I am MundaLink. Are you a farmer with produce to sell, a buyer looking for crops, or do you want a market price or storage advice?",
+    placeholder: "Type a message. Example: I want to sell tomatoes",
+    send: "Send",
+    chips: [
+      ["I want to sell tomatoes", "I want to sell tomatoes"],
+      ["Find tomatoes in Chongwe", "I need 10 bags of tomatoes in Chongwe"],
+      ["Look for onions", "I need onions in Chongwe"],
+      ["Maize price", "What is the market price of maize?"],
+    ],
+  },
+  bem: {
+    greeting: "Muli shani. Nine MundaLink. Bushe muli balimi, mulefwaya ukushita, nangu mulefwaya umutengo?",
+    placeholder: "Lembeni umulandu. Mwachitsanzo: Ndefwaya ukushitisha amataba ku Chongwe",
+    send: "Tumani",
+    chips: [
+      ["Ndefwaya ukushitisha amataba", "Ndefwaya ukushitisha amataba"],
+      ["Amataba ku Lusaka", "Ndefwaya ukushita amataba 10 ku Lusaka"],
+      ["Tamati ku Chongwe", "Ndefwaya tamati imitumba 20 ku Chongwe"],
+      ["Umutengo wa mataba", "Umutengo wa amataba ni shinga?"],
+    ],
+  },
+  nya: {
+    greeting: "Moni. Ndine MundaLink. Kodi ndinu mlimi wogulitsa, wogula, kapena mukufuna mtengo wa msika?",
+    placeholder: "Lembani uthenga. Mwachitsanzo: Ndine na matumba 20 ya tomato ku Chongwe",
+    send: "Tumizani",
+    chips: [
+      ["Ndine na matumba 20 ya tomato", "Ndine na matumba 20 ya tomato ku Chongwe"],
+      ["Ndifuna tomato ku Chongwe", "Ndifuna matumba 10 ya tomato ku Chongwe"],
+      ["Ndifuna anyezi", "Ndifuna anyezi ku Chongwe"],
+      ["Mtengo wa chimanga", "Mtengo wa chimanga ndi wotani?"],
+    ],
+  },
+};
 
 document.querySelector("#refresh-listings").addEventListener("click", () => loadListings());
 document.querySelector("#refresh-prices").addEventListener("click", () => loadPrices());
@@ -26,10 +64,17 @@ input.addEventListener("keydown", (event) => {
   }
 });
 
-chips.forEach((button) => {
-  button.addEventListener("click", () => sendMessage(button.dataset.prompt));
+chipBox.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-prompt]");
+  if (!button) return;
+  sendMessage(button.dataset.prompt);
 });
 
+document.querySelectorAll(".lang-picker button").forEach((button) => {
+  button.addEventListener("click", () => applyLanguage(button.dataset.lang));
+});
+
+applyLanguage(savedLanguage());
 loadHealth();
 loadListings();
 loadPrices();
@@ -129,7 +174,7 @@ async function sendMessage(text) {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: history }),
+      body: JSON.stringify({ messages: history, language }),
     });
     const data = await response.json();
     history.push({ role: "assistant", content: data.reply || "Sorry, I could not get a reply." });
@@ -158,9 +203,33 @@ function renderMessages() {
 function setBusy(busy) {
   form.dataset.busy = busy ? "1" : "0";
   input.disabled = busy;
-  form.querySelector("button").disabled = busy;
-  chips.forEach((button) => { button.disabled = busy; });
+  sendButton.disabled = busy;
+  chipBox.querySelectorAll("button").forEach((button) => { button.disabled = busy; });
   pendingEl.hidden = !busy;
+}
+
+function savedLanguage() {
+  try {
+    return sessionStorage.getItem("mundalink-lang") || "en";
+  } catch (err) {
+    return "en";
+  }
+}
+
+function applyLanguage(code) {
+  language = UI[code] ? code : "en";
+  try { sessionStorage.setItem("mundalink-lang", language); } catch (err) { /* the button still works this visit */ }
+  const copy = UI[language];
+  const greetingEl = document.querySelector("#messages .assistant p");
+  if (greetingEl) greetingEl.textContent = copy.greeting;
+  input.placeholder = copy.placeholder;
+  sendButton.textContent = copy.send;
+  chipBox.innerHTML = copy.chips.map(([label, prompt]) => {
+    return `<button type="button" data-prompt="${escapeHtml(prompt)}">${escapeHtml(label)}</button>`;
+  }).join("");
+  document.querySelectorAll(".lang-picker button").forEach((button) => {
+    button.setAttribute("aria-pressed", button.dataset.lang === language ? "true" : "false");
+  });
 }
 
 function formatMessage(text) {

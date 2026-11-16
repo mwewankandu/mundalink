@@ -84,6 +84,7 @@ The database is three text files:
 | `data/farmers.json` | Farmer name, place, phone, and whether they agreed to share the phone |
 | `data/listings.json` | Crop, quantity, unit, asking price, place, and status |
 | `data/market_prices.json` | Price reports. Leave `price` as `null` until you have a real, dated source |
+| `data/glossary.json` | Bemba and Nyanja words for crops and units. The English word is what gets saved |
 
 Open a file, change a value, save it, and refresh the browser. You do not need to restart the server.
 
@@ -146,6 +147,68 @@ It should say it could not find onions. It should not invent a seller or a price
 - `What is the market price of maize?` — it should say the stored row is demo data, and give the source and the date. It should not invent a kwacha amount.
 - `How should I store maize after harvest?` — short practical tips. For pests or food safety, it should point you to an extension officer.
 
+### 4. Local language
+
+Above the chat, choose **Chinyanja**. The greeting and the box hint should change. Type:
+
+`Ndine na matumba 20 ya tomato ku Chongwe`
+
+MundaLink should treat that as 20 bags of tomatoes in Chongwe, ask the remaining questions in Nyanja, and repeat the crop, quantity, price, and place before it saves. After a save, the produce card must say **Tomatoes** and **bags** in English, not "matumba".
+
+Then choose **Ichibemba** and type:
+
+`Ndefwaya ukushita amataba 10 ku Lusaka`
+
+It should search the Lusaka maize (15 bags at K340 per bag) and reply in Bemba. It should not invent another farmer.
+
+## Languages
+
+A farmer or buyer can write in English, Ichibemba (Bemba), Chinyanja (Nyanja/Chichewa), or a mix. MundaLink should answer in the language they used. The buttons above the chat only change the greeting, the example questions, and the hint in the box. The reply still follows the words the person actually typed.
+
+Crop names and units are saved in English, so a search for tomatoes still finds a listing that was typed as "phwetekere" or "tamati". Town names stay as the town: Chongwe, Lusaka. Numbers are not converted.
+
+The word list is `data/glossary.json`. Open it, fix a spelling, save, and send another chat message. You do not need to restart the server.
+
+**These Bemba and Nyanja translations were drafted with AI. They were not written by a native speaker.** Please have one Bemba speaker and one Nyanja speaker check the glossary and the phrases below before the demo. If a word is wrong, change the glossary. If a word is missing, MundaLink is supposed to ask, not guess.
+
+### Chinyanja phrases to check
+
+Each line is something to type. The note is what should happen.
+
+1. `Moni. Ndine mlimi.` — greeting. MundaLink treats you as a farmer and replies in Nyanja.
+2. `Ndifuna kugulitsa chimanga.` — you want to sell maize. It should ask for the missing details, one question at a time.
+3. `Ndine na matumba 20 ya tomato ku Chongwe.` — 20 bags of tomatoes in Chongwe. The number 20 must stay 20.
+4. `Ndifuna matumba 10 ya tomato ku Chongwe.` — buyer search. It should find the Chongwe tomatoes and say the total for 10 bags.
+5. `Ndifuna anyezi ku Chongwe.` — onions. It should say there is no listing. It should not invent a seller.
+6. `Mtengo wa chimanga ndi wotani?` — maize price. It should say the stored row is demo data, with the source and the date, and no made-up kwacha amount.
+7. `Phwetekere ndi zingati?` — tomato price. Same rule: no invented price.
+8. `Kabichi 12 mabokosi ku Kafue.` — 12 crates of cabbage in Kafue.
+9. `Mtedza matumba 5.` — 5 bags of groundnuts.
+10. `Nyemba ku Lusaka.` — beans in Lusaka.
+11. `Chinangwa.` — cassava. It should ask what you want to do with it.
+12. `Mbatata ku Chongwe.` — sweet potatoes in Chongwe.
+13. `Nthochi 30 kg.` — 30 kg of bananas. 30 stays 30.
+14. `Inde, sungani.` — yes, save, but only after it has shown the summary. The card is in English.
+15. `Ayi, musagawane nambala yanga.` — no, do not share the phone number.
+
+### Ichibemba phrases to check
+
+1. `Muli shani. Ndi mulimi.` — greeting. It should reply in Bemba and treat you as a farmer.
+2. `Ndefwaya ukushitisha amataba.` — you want to sell maize.
+3. `Ndefwaya ukushita amataba 10 ku Lusaka.` — buy 10 bags of maize in Lusaka. It should find Mary Phiri's listing.
+4. `Ndefwaya tamati imitumba 20 ku Chongwe.` — 20 bags of tomatoes in Chongwe.
+5. `Umutengo wa amataba ni shinga?` — maize price. Demo only, with source and date. No invented amount.
+6. `Kalundwe ku Lusaka.` — cassava in Lusaka.
+7. `Kabichi ku Lusaka.` — cabbage in Lusaka.
+8. `Imbalala.` — groundnuts. It should ask what you want to do.
+9. `Umupunga.` — rice.
+10. `Cilashi ku Chongwe.` — potatoes in Chongwe.
+11. `Amataba ku Chongwe.` — maize in Chongwe. The real maize listing is in Lusaka, so it should say this is not an exact match and offer that listing.
+12. `Ee, yasaleni.` — yes, save, only after the summary. The card is in English.
+13. `Awe, mwishibisha inambala yandi.` — no, do not share the phone number.
+14. `Itaba 15 ku Lusaka.` — 15 of maize in Lusaka. 15 stays 15.
+15. `Ndefwaya ifisashi.` — this word is not in the glossary. MundaLink should ask what the crop is, not guess.
+
 ## Run the tests
 
 The tests use a copy of the demo files and a pretend Grok API, so they do not need a key and they do not call xAI.
@@ -160,8 +223,9 @@ node --test
 
 - `server.js` — starts the website
 - `lib/store.js` — reads and writes the JSON files, and applies the matching rules
+- `lib/glossary.js` — turns known Bemba and Nyanja crop and unit words into English
 - `lib/chat.js` — calls Grok and runs the tools
-- `lib/prompt.js` — the chatbot instructions
+- `lib/prompt.js` — the chatbot instructions, including the language rules
 - `public/` — the page (HTML, CSS, and plain JavaScript)
 - `data/` — the demo database
 - `test/mundalink.test.js` — checks for privacy, search, saving, and the missing-key message
