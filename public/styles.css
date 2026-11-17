@@ -329,7 +329,52 @@ h1 {
   cursor: pointer;
 }
 
-.composer { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+.composer { display: flex; flex-direction: column; gap: 8px; }
+
+.composer-actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+
+.composer-actions .button { min-height: 44px; }
+
+.button-mic {
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  color: var(--leaf-dark);
+  border: 1.5px solid var(--leaf);
+}
+
+.button-mic.is-listening {
+  background: var(--clay);
+  border-color: var(--clay);
+  color: white;
+}
+
+.voice-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+
+.voice-toggle {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 10px;
+  min-height: 44px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.voice-toggle[aria-pressed="true"] {
+  background: var(--leaf);
+  border-color: var(--leaf);
+  color: white;
+}
+
+.voice-status { min-height: 1.2em; margin: 0 0 6px; color: var(--clay); font-weight: 600; }
+
+.button-mic:focus-visible, .voice-toggle:focus-visible {
+  outline: 3px solid var(--maize);
+  outline-offset: 2px;
+}
 
 textarea {
   width: 100%;
