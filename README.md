@@ -161,6 +161,28 @@ Then choose **Ichibemba** and type:
 
 It should search the Lusaka maize (15 bags at K340 per bag) and reply in Bemba. It should not invent another farmer.
 
+### 5. Voice
+
+Use Chrome or Edge, on this computer (`http://localhost:3000`) or a secure `https` page. Allow the microphone when the browser asks. Speech recognition needs an internet connection.
+
+1. Turn **Speaker** on if you want to hear the reply.
+2. Press the microphone, say `I want to sell tomatoes`, and pause. The words should land in the box and send when you stop. Press **Stop** if you want to cut it short.
+3. Turn **Conversation** on for a back-and-forth: after MundaLink finishes speaking, it listens again. Press **Conversation on** once more to turn that off. Turning the speaker off also turns conversation mode off.
+
+On Ichibemba or Chinyanja, the mic uses those languages only when the browser has a matching voice. Otherwise it listens in English and says so.
+
+## Voice
+
+The mic, the speaker, and conversation mode use the browser's own speech tools. There is no extra package and no paid voice service.
+
+- **Chrome or Edge.** Firefox does not offer speech-to-text here, so the mic stays hidden and a short note tells you to use Chrome or Edge. Typing still works.
+- **Microphone permission.** If you block it, the chat says so and you can type instead.
+- **Internet.** Chrome sends the recording to its speech service, so the mic needs a connection.
+- **Address.** Use `http://localhost:3000` while you are testing, or `https` on a public site. A plain `http` address on another computer will not open the mic.
+- **Speaker** is remembered in this browser. Replies are read aloud with markdown and emoji removed, so a line like `**Tomatoes** · 20 bags` is spoken as "Tomatoes, 20 bags".
+- **Conversation** waits until the reply has been spoken, then listens again. Turn it off when you are done.
+- English speech uses Zambian English when the browser has it, and British English otherwise. Bemba (`bem-ZM`) and Nyanja (`ny-MW`) are used only when a matching voice is installed.
+
 ## Languages
 
 A farmer or buyer can write in English, Ichibemba (Bemba), Chinyanja (Nyanja/Chichewa), or a mix. MundaLink should answer in the language they used. The buttons above the chat only change the greeting, the example questions, and the hint in the box. The reply still follows the words the person actually typed.
@@ -227,6 +249,7 @@ node --test
 - `lib/chat.js` — calls Grok and runs the tools
 - `lib/prompt.js` — the chatbot instructions, including the language rules
 - `public/` — the page (HTML, CSS, and plain JavaScript)
+- `public/voice.js` — microphone, speaker, and conversation mode
 - `data/` — the demo database
 - `test/mundalink.test.js` — checks for privacy, search, saving, and the missing-key message
 

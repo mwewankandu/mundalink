@@ -8,7 +8,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,680&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -100,10 +100,22 @@
         <button type="button" data-prompt="I need onions in Chongwe">Look for onions</button>
         <button type="button" data-prompt="What is the market price of maize?">Maize price</button>
       </div>
+      <p id="voice-status" class="voice-status" aria-live="polite"></p>
+      <div class="voice-bar">
+        <button type="button" class="voice-toggle" id="speaker-toggle" hidden aria-pressed="false">Speaker off</button>
+        <button type="button" class="voice-toggle" id="conversation-toggle" hidden aria-pressed="false" aria-label="Conversation mode, turn off to stop the back and forth">Conversation off</button>
+      </div>
+      <p id="voice-note" class="lang-note" hidden>This browser cannot use the microphone. Use Chrome or Edge to talk. You can still type.</p>
       <form id="chat-form" class="composer">
         <label class="visually-hidden" for="chat-input">Message MundaLink</label>
         <textarea id="chat-input" rows="2" placeholder="Type a message. Example: I want to sell tomatoes" required></textarea>
-        <button class="button" type="submit">Send</button>
+        <div class="composer-actions">
+          <button class="button button-mic" type="button" id="mic-button" hidden aria-pressed="false" aria-label="Speak your message">
+            <span aria-hidden="true">🎤</span>
+            <span id="mic-label">Speak</span>
+          </button>
+          <button class="button" type="submit" id="send-button">Send</button>
+        </div>
       </form>
     </aside>
 
@@ -144,6 +156,7 @@
     <p><strong>MundaLink</strong> · Grow more. Waste less. Earn better.</p>
     <p>Demo for the Grok Bot Lusaka Hackathon, 21 November 2026. Sample farmers and price rows are fictional.</p>
   </footer>
+  <script src="/voice.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

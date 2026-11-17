@@ -623,6 +623,11 @@ describe("website", () => {
     assert.match(html, /Grow more\. Waste less\. Earn better\./);
     assert.match(html, /Ichibemba/);
     assert.match(html, /Chinyanja/);
+    assert.match(html, /id="mic-button"/);
+    assert.match(html, /id="speaker-toggle"/);
+    assert.match(html, /id="conversation-toggle"/);
+    assert.match(html, /Use Chrome or Edge/);
+    assert.match(html, /Poppins/);
     assert.equal(html.includes("DEMO-001"), false);
 
     const health = await (await fetch(`http://127.0.0.1:${port}/api/health`)).json();

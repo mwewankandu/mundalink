@@ -11,7 +11,8 @@ const statusEl = document.querySelector("#chat-status");
 const listingCards = document.querySelector("#listing-cards");
 const priceCards = document.querySelector("#price-cards");
 const chipBox = document.querySelector(".chips");
-const sendButton = form.querySelector("button");
+const sendButton = document.querySelector("#send-button");
+let voice = null;
 
 const UI = {
   en: {
@@ -75,6 +76,7 @@ document.querySelectorAll(".lang-picker button").forEach((button) => {
 });
 
 applyLanguage(savedLanguage());
+setupVoice();
 loadHealth();
 loadListings();
 loadPrices();
@@ -166,6 +168,9 @@ function statusBadge(status) {
 async function sendMessage(text) {
   const content = String(text || "").trim();
   if (!content || form.dataset.busy === "1") return;
+  if (voice) voice.prepareSend();
+  const voiceStatus = document.querySelector("#voice-status");
+  if (voiceStatus && voiceStatus.textContent === "Listening…") voiceStatus.textContent = "";
   input.value = "";
   history.push({ role: "user", content });
   renderMessages();
@@ -186,6 +191,8 @@ async function sendMessage(text) {
   } finally {
     setBusy(false);
     input.focus();
+    const last = history[history.length - 1];
+    if (voice && last && last.role === "assistant") voice.speak(last.content);
   }
 }
 
@@ -205,7 +212,100 @@ function setBusy(busy) {
   input.disabled = busy;
   sendButton.disabled = busy;
   chipBox.querySelectorAll("button").forEach((button) => { button.disabled = busy; });
+  const mic = document.querySelector("#mic-button");
+  if (mic) mic.disabled = busy;
   pendingEl.hidden = !busy;
+}
+
+function setupVoice() {
+  const api = window.MundaVoice;
+  const mic = document.querySelector("#mic-button");
+  const speaker = document.querySelector("#speaker-toggle");
+  const conversation = document.querySelector("#conversation-toggle");
+  const status = document.querySelector("#voice-status");
+  const note = document.querySelector("#voice-note");
+  if (!api || !mic) return;
+
+  const storage = {
+    getItem: function (key) {
+      try { return localStorage.getItem(key); } catch (err) { return null; }
+    },
+    setItem: function (key, value) {
+      try { localStorage.setItem(key, value); } catch (err) { /* the choice still works this visit */ }
+    },
+  };
+
+  voice = api.createVoiceController({
+    SpeechRecognition: window.SpeechRecognition || window.webkitSpeechRecognition,
+    speechSynthesis: window.speechSynthesis,
+    Utterance: window.SpeechSynthesisUtterance,
+    storage: storage,
+    getLanguage: function () { return language; },
+    getVoiceLangs: function () {
+      if (!window.speechSynthesis || !window.speechSynthesis.getVoices) return [];
+      return window.speechSynthesis.getVoices().map(function (item) { return item.lang; });
+    },
+    getVoices: function () {
+      if (!window.speechSynthesis || !window.speechSynthesis.getVoices) return [];
+      return window.speechSynthesis.getVoices();
+    },
+    getTranscript: function () { return input.value; },
+    isBusy: function () { return form.dataset.busy === "1"; },
+    onTranscript: function (text) { input.value = text; },
+    onFinal: function (text) { sendMessage(text); },
+    onStatus: function (text) { status.textContent = text || ""; },
+    onNote: function (text) {
+      note.hidden = !text;
+      if (text) note.textContent = text;
+    },
+    onConversationListen: function () {
+      if (voice && !voice.state().listening) voice.startListening();
+    },
+    onState: renderVoiceControls,
+  });
+
+  const support = voice.supported();
+  if (support.recognition) mic.hidden = false;
+  else {
+    note.hidden = false;
+    note.textContent = "This browser cannot use the microphone. Use Chrome or Edge to talk. You can still type.";
+  }
+  if (support.synthesis) {
+    speaker.hidden = false;
+    if (support.recognition) conversation.hidden = false;
+  }
+  renderVoiceControls(voice.state());
+
+  mic.addEventListener("click", function () {
+    if (voice.state().listening) voice.stopListening(false);
+    else voice.startListening();
+  });
+  speaker.addEventListener("click", function () { voice.toggleSpeaker(); });
+  conversation.addEventListener("click", function () { voice.toggleConversation(); });
+}
+
+function renderVoiceControls(state) {
+  const mic = document.querySelector("#mic-button");
+  const micLabel = document.querySelector("#mic-label");
+  const speaker = document.querySelector("#speaker-toggle");
+  const conversation = document.querySelector("#conversation-toggle");
+  const status = document.querySelector("#voice-status");
+  if (mic) {
+    mic.classList.toggle("is-listening", state.listening);
+    mic.setAttribute("aria-pressed", state.listening ? "true" : "false");
+    mic.setAttribute("aria-label", state.listening ? "Stop listening" : "Speak your message");
+    if (micLabel) micLabel.textContent = state.listening ? "Stop" : "Speak";
+  }
+  if (speaker) {
+    speaker.setAttribute("aria-pressed", state.speakerOn ? "true" : "false");
+    speaker.textContent = state.speakerOn ? "Speaker on" : "Speaker off";
+    speaker.setAttribute("aria-label", state.speakerOn ? "Stop reading replies aloud" : "Read replies aloud");
+  }
+  if (conversation) {
+    conversation.setAttribute("aria-pressed", state.conversationOn ? "true" : "false");
+    conversation.textContent = state.conversationOn ? "Conversation on" : "Conversation off";
+  }
+  if (state.listening && status) status.textContent = "Listening…";
 }
 
 function savedLanguage() {
@@ -230,6 +330,15 @@ function applyLanguage(code) {
   document.querySelectorAll(".lang-picker button").forEach((button) => {
     button.setAttribute("aria-pressed", button.dataset.lang === language ? "true" : "false");
   });
+  if (voice && window.MundaVoice && voice.supported().recognition) {
+    const langs = window.speechSynthesis ? window.speechSynthesis.getVoices().map(function (item) { return item.lang; }) : [];
+    const selected = window.MundaVoice.speechChoice(language, langs);
+    const note = document.querySelector("#voice-note");
+    if (note) {
+      note.hidden = !selected.note;
+      if (selected.note) note.textContent = selected.note;
+    }
+  }
 }
 
 function formatMessage(text) {
