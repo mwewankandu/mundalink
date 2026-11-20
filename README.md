@@ -4,6 +4,12 @@ MundaLink is a small website for the Grok Bot Lusaka Hackathon (21 November 2026
 
 The tagline is: **Grow more. Waste less. Earn better.**
 
+## Why MundaLink
+
+This idea started when I talked with my grandfather. He farms on a small scale, and he told me his produce was going to waste because he could not find buyers.
+
+He and other farmers around him had also been told that the government has not released funds to the Food Reserve Agency (FRA) to buy their crops. The reason they were given is that the FRA says it has already stocked enough to last until 2028. Farmers like my grandfather need another way to reach buyers directly. That is what MundaLink is for.
+
 The sample farmers, listings, and prices in this project are **fictional demo data**. They are labelled **Demo data** on the page. Market prices do not include a made-up kwacha amount.
 
 ## What you need
